@@ -1,13 +1,15 @@
 
 
 def ingresar_calificaciones():
+    """Funcion que solicita el ingreso de materias
+        con sus calificaciones"""
 
     nombres = []
     calificaciones = []
     isAddSubject = True
 
     while isAddSubject:
-
+        
         while True:
             nombre = input("Ingrese el nombre de la materia: ")
             if len(nombre) == 0:
@@ -45,13 +47,15 @@ def ingresar_calificaciones():
 
 
 def calcular_promedio(calificaciones):
+    """Funcion que realiza el calculo del promedio de las calificaciones"""
     suma = sum(calificaciones)
     promedio = suma / len(calificaciones) 
     print("El promedio de las calificaciones es: ", promedio)
     
 
 def determinar_estado(calificaciones, umbral, nombres):
-
+    """Funcion que determina las materias aprobadas y reprobadas
+        segun un umbral dado"""
     aprobadas = []
     reprobadas = []
     count = 0
@@ -70,6 +74,8 @@ def determinar_estado(calificaciones, umbral, nombres):
     return aprobadas, reprobadas
 
 def encontrar_extremos(nombres, calificaciones):
+    """Funcion que encuentra la materia con mejor calificacion y 
+        la peor calificacion"""
     count = 0
     lower_index = 0
     lower_value = 10
@@ -106,14 +112,23 @@ def main():
 
     nombres, calificaciones = ingresar_calificaciones()
 
+    print()
+    print("------------Materias-------------")
     for nombre, calificacione in zip(nombres, calificaciones):
-        print(f"Materia: {nombre}, Calificación: {calificacione}")
-
+        print(f"{nombre}, Calificación: {calificacione}")
+    print("-----------------------------------")
     print(f"Total Materias: {len(calificaciones)}")
+    print("-----------------------------------")
+    print()
+    print("------------Promedios--------------")
+    print()
     calcular_promedio(calificaciones)
+    print()
     determinar_estado(calificaciones, 5, nombres)
+    print()
     encontrar_extremos(nombres, calificaciones)
-
+    print()
+    print()
     print("Te agradecemos por usar la calculadora de promedios")
 
 if __name__ == "__main__":
