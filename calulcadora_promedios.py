@@ -22,12 +22,12 @@ def ingresar_calificaciones():
         
         while  True:
             try:
-                calificacion = float(input("Ingrese una calificacion de 1 a 10: "))
-                if calificacion >= 1 and calificacion <= 10:
+                calificacion = float(input("Ingrese una calificacion de 0 a 10: "))
+                if calificacion >= 0 and calificacion <= 10:
                     calificaciones.append(calificacion)
                     break
                 else:
-                    print("La calificación debe ser mayor a 1 y menor o igual a 10") 
+                    print("La calificación debe ser mayor a 0 y menor o igual a 10") 
             except ValueError:
                 print("Debe ingresar un número válido. Ejemplo: 5.5")
         
@@ -50,7 +50,7 @@ def calcular_promedio(calificaciones):
     """Funcion que realiza el calculo del promedio de las calificaciones"""
     suma = sum(calificaciones)
     promedio = suma / len(calificaciones) 
-    print("El promedio de las calificaciones es: ", promedio)
+    return promedio
     
 
 def determinar_estado(calificaciones, umbral, nombres):
@@ -68,49 +68,22 @@ def determinar_estado(calificaciones, umbral, nombres):
             reprobadas.append(nombres[count])
         count += 1
     
-    print("Materias aprobadas:", ", ".join(aprobadas))
-    print("Materias reprobadas:", ", ".join(reprobadas))
-    
     return aprobadas, reprobadas
 
-def encontrar_extremos(nombres, calificaciones):
+def encontrar_extremos(calificaciones):
     """Funcion que encuentra la materia con mejor calificacion y 
         la peor calificacion"""
-    count = 0
-    lower_index = 0
-    lower_value = 10
-    lower_name = ""
-    upper_index = 0
-    upper_value = 1
-    upper_name = ""
 
-    for calificacion in calificaciones:
-        
-        if calificacion <= lower_value:
-            lower_index = count
-            lower_value = calificacion
-            lower_name = nombres[count]
+    if not calificaciones:
+        return None, None
 
-        if calificacion > upper_value:
-            upper_index = count
-            upper_value = calificacion
-            upper_name = nombres[count]
+    lower_index = min(range(len(calificaciones)), key=lambda i: calificaciones[i])
+    upper_index = max(range(len(calificaciones)), key=lambda i: calificaciones[i])
 
-        count += 1
-
-    print(f"Mejor calificacion es {(upper_name)} con: ", upper_value)
-    print(F"Peor calificacion es {(lower_name)} con: ", lower_value)
-    
     return lower_index, upper_index
     
 
-
-def main():
-    print("Bienvenido a la calculadora de promedios")
-    nombres = []
-    calificaciones = []
-
-    nombres, calificaciones = ingresar_calificaciones()
+def mostrar_resumen(nombres, calificaciones, promedio, aprobadas, reprobadas, lower_index, upper_index):
 
     print()
     print("------------Materias-------------")
@@ -122,14 +95,36 @@ def main():
     print()
     print("------------Promedios--------------")
     print()
-    calcular_promedio(calificaciones)
+    print("El promedio de las calificaciones es: ", promedio)
     print()
-    determinar_estado(calificaciones, 5, nombres)
+    print("Materias aprobadas:", ", ".join(aprobadas))
+    print("Materias reprobadas:", ", ".join(reprobadas))
     print()
-    encontrar_extremos(nombres, calificaciones)
-    print()
+    print(f"Mejor calificacion es {nombres[upper_index]} con: {calificaciones[upper_index]}")
+    print(F"Peor calificacion es {nombres[lower_index]} con: {calificaciones[lower_index]}")
     print()
     print("Te agradecemos por usar la calculadora de promedios")
+    print()
+
+
+def main():
+    print("Bienvenido a la calculadora de promedios")
+    nombres = []
+    calificaciones = []
+
+    nombres, calificaciones = ingresar_calificaciones()
+
+    if not calificaciones:
+        print("No se ingresaron calificaciones. No se puede calcular el promedio.")
+        return
+
+    promedio = calcular_promedio(calificaciones)
+
+    aprobadas, reprobadas = determinar_estado(calificaciones, 5, nombres)
+
+    lower_index, upper_index = encontrar_extremos(calificaciones)
+
+    mostrar_resumen(nombres, calificaciones, promedio, aprobadas, reprobadas, lower_index, upper_index)
 
 if __name__ == "__main__":
     main()
