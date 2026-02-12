@@ -1,3 +1,4 @@
+UMBRAL_APROBACION = 5.0
 
 
 def ingresar_calificaciones():
@@ -23,52 +24,53 @@ def ingresar_calificaciones():
         while  True:
             try:
                 calificacion = float(input("Ingrese una calificacion de 0 a 10: "))
-                if calificacion >= 0 and calificacion <= 10:
+                if 0 <= calificacion <= 10:
                     calificaciones.append(calificacion)
                     break
                 else:
-                    print("La calificación debe ser mayor a 0 y menor o igual a 10") 
+                    print("La calificación debe estar entre 0 y 10 (inclusive).")
             except ValueError:
                 print("Debe ingresar un número válido. Ejemplo: 5.5")
         
-        opcion = input("¿Desea agregar otra materia? (si/no): ")
+        opcion = input("¿Desea agregar otra materia? (si/no) [s/n]: ")
 
         while True:
-            if opcion.lower() != "si" and opcion.lower() != "no":
-                opcion = input("Opción inválida. Por favor ingrese 'si' o 'no': ")
-            else:
+            opt = opcion.strip().lower()
+            if opt in ("si", "s"):
                 break
-
-        if opcion.lower() != "si":
-            isAddSubject = False   
+            if opt in ("no", "n"):
+                isAddSubject = False
+                break
+            opcion = input("Opción inválida. Por favor ingrese 'si'/'s' o 'no'/'n': ")
+            
         
     return nombres, calificaciones
 
 
 
 def calcular_promedio(calificaciones):
-    """Funcion que realiza el calculo del promedio de las calificaciones"""
+    """Funcion que realiza el calculo del promedio de las calificaciones.
+    Devuelve None si la lista de calificaciones está vacía."""
+    if not calificaciones:
+        return None
     suma = sum(calificaciones)
-    promedio = suma / len(calificaciones) 
+    promedio = suma / len(calificaciones)
     return promedio
     
 
-def determinar_estado(calificaciones, umbral, nombres):
-    """Funcion que determina las materias aprobadas y reprobadas
-        segun un umbral dado"""
-    aprobadas = []
-    reprobadas = []
-    count = 0
+def determinar_estado(calificaciones, umbral):
+    """Funcion que determina los indices de materias aprobadas y reprobadas
+        segun un umbral dado. Devuelve dos listas de indices (aprobadas, reprobadas)."""
+    aprobadas_idx = []
+    reprobadas_idx = []
 
-    for calificacion in calificaciones:
-        
+    for i, calificacion in enumerate(calificaciones):
         if calificacion >= umbral:
-            aprobadas.append(nombres[count])
+            aprobadas_idx.append(i)
         else:
-            reprobadas.append(nombres[count])
-        count += 1
-    
-    return aprobadas, reprobadas
+            reprobadas_idx.append(i)
+
+    return aprobadas_idx, reprobadas_idx
 
 def encontrar_extremos(calificaciones):
     """Funcion que encuentra la materia con mejor calificacion y 
@@ -83,7 +85,8 @@ def encontrar_extremos(calificaciones):
     return lower_index, upper_index
     
 
-def mostrar_resumen(nombres, calificaciones, promedio, aprobadas, reprobadas, lower_index, upper_index):
+
+def mostrar_resumen(nombres, calificaciones, promedio, aprobadas_idx, reprobadas_idx, lower_index, upper_index, umbral):
 
     print()
     print("------------Materias-------------")
@@ -95,20 +98,25 @@ def mostrar_resumen(nombres, calificaciones, promedio, aprobadas, reprobadas, lo
     print()
     print("------------Promedios--------------")
     print()
-    print("El promedio de las calificaciones es: ", promedio)
+    print(f"Umbral de aprobacion: {umbral}")
+    print("El promedio de las calificaciones es:", promedio if promedio is not None else "N/A")
     print()
-    print("Materias aprobadas:", ", ".join(aprobadas))
-    print("Materias reprobadas:", ", ".join(reprobadas))
+    aprobadas_nombres = [nombres[i] for i in aprobadas_idx]
+    reprobadas_nombres = [nombres[i] for i in reprobadas_idx]
+    print("Materias aprobadas:", ", ".join(aprobadas_nombres) if aprobadas_nombres else "Ninguna")
+    print("Materias reprobadas:", ", ".join(reprobadas_nombres) if reprobadas_nombres else "Ninguna")
     print()
-    print(f"Mejor calificacion es {nombres[upper_index]} con: {calificaciones[upper_index]}")
-    print(F"Peor calificacion es {nombres[lower_index]} con: {calificaciones[lower_index]}")
+    if lower_index is None or upper_index is None:
+        print("No hay materias para determinar mejor/peor calificación.")
+    else:
+        print(f"Mejor calificacion es {nombres[upper_index]} con: {calificaciones[upper_index]}")
+        print(f"Peor calificacion es {nombres[lower_index]} con: {calificaciones[lower_index]}")
     print()
     print("Te agradecemos por usar la calculadora de promedios")
     print()
 
 
 def main():
-    print("Bienvenido a la calculadora de promedios")
     nombres = []
     calificaciones = []
 
@@ -120,13 +128,14 @@ def main():
 
     promedio = calcular_promedio(calificaciones)
 
-    aprobadas, reprobadas = determinar_estado(calificaciones, 5, nombres)
+    aprobadas_idx, reprobadas_idx = determinar_estado(calificaciones, UMBRAL_APROBACION)
 
     lower_index, upper_index = encontrar_extremos(calificaciones)
 
-    mostrar_resumen(nombres, calificaciones, promedio, aprobadas, reprobadas, lower_index, upper_index)
+    mostrar_resumen(nombres, calificaciones, promedio, aprobadas_idx, reprobadas_idx, lower_index, upper_index, UMBRAL_APROBACION)
 
 if __name__ == "__main__":
+    print("Bienvenido a la calculadora de promedios")
     main()
 
 
